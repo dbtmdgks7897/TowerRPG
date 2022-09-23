@@ -7,11 +7,12 @@ public class CharacterControlable : Controlable
     public Transform charBody;
     public Transform cameraArmSocket;
     public Transform cameraArm;
+    public bool isJumping = false;
 
     Animator animator;
     Rigidbody rigidbody;
-
-    public float jumpForce = 5f;
+    
+    public float jumpForce = 0.5f;
 
     public override void Interact()
     {
@@ -20,7 +21,11 @@ public class CharacterControlable : Controlable
 
     public override void Jump()
     {
-        rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        if (!isJumping)
+        {
+            rigidbody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isJumping = true;
+        }
     }
 
     public override void Move(Vector2 input)
@@ -61,5 +66,12 @@ public class CharacterControlable : Controlable
     {
         animator = charBody.GetComponent<Animator>();
         rigidbody = GetComponent<Rigidbody>();
+    }
+
+    void OnCollisionEnter(Collision collision) //충돌 감지
+    {
+        if (collision.gameObject.tag == "Ground") { //tag가 Floor인 오브젝트와 충돌했을 때
+            isJumping = false; //isJumping을 다시 false로
+        }
     }
 }
